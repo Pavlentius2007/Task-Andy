@@ -4,34 +4,32 @@ import (
 	"fmt"
 )
 
-func maskLinks(input string) string {
-	const prefix = "http://"
-	const mask = "****************"
+func main() {
+	bytes := []byte("Hello, its my page: http://localhodsersest123.com See you")
 
-	inputBytes := []byte(input)
-	prefixBytes := []byte(prefix)
-	maskBytes := []byte(mask)
+	usr := bytes[:]
+	for _, b := range bytes {
+		fmt.Printf("%v", b)
+		letter := string(b)
+		fmt.Printf("%v\n", letter) // Выводим значение каждого байта
+	}
+	fmt.Println()
+	fmt.Println(string(usr))
 
-	var output []byte
-	i := 0
+	found := false
+	for b := 0; b < len(bytes)-1; b++ {
 
-	for i < len(inputBytes) {
-		if len(inputBytes)-i >= len(prefixBytes) && string(inputBytes[i:i+len(prefixBytes)]) == prefix {
-			output = append(output, prefixBytes...)
-			output = append(output, maskBytes...)
-			i += len(prefixBytes)
-		} else {
-			output = append(output, inputBytes[i])
-			i++
+		if bytes[b] == 47 && bytes[b-1] == 47 && bytes[b-2] == 58 && bytes[b-3] == 112 && bytes[b-4] == 116 && bytes[b-5] == 116 && bytes[b-6] == 104 {
+			found = true
+			continue
+		}
+		if found {
+			if bytes[b] == 32 {
+				break
+			}
+			bytes[b] = byte('*')
+
 		}
 	}
-
-	return string(output)
-}
-
-func main() {
-	input := "Hello, its my page: http://localhodsersest123.com See you"
-	output := maskLinks(input)
-	fmt.Println("Input:", input)
-	fmt.Println("Output:", output)
+	fmt.Printf("Маскированный байтовый срез: %v\n", string(usr))
 }
