@@ -1,11 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 )
 
 func main() {
-	bytes := []byte("Hello, its my page: http://localhodsersest123.com See you")
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Enter a string: ")
+	scanner.Scan()
+	text := scanner.Text()
+	fmt.Println(text)
+	bytes := []byte(text)
 
 	usr := bytes[:]
 	for _, b := range bytes {
