@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+
 	"fmt"
 	"os"
 )
@@ -12,31 +13,23 @@ func main() {
 	scanner.Scan()
 	text := scanner.Text()
 	fmt.Println(text)
-	bytes := []byte(text)
+	Find := []byte("http://")
+	Input := []byte(text)
 
-	usr := bytes[:]
-	for _, b := range bytes {
-		fmt.Printf("%v", b)
-		letter := string(b)
-		fmt.Printf("%v\n", letter) // Выводим значение каждого байта
-	}
-	fmt.Println()
-	fmt.Println(string(usr))
+	for i := 0; i < len(Input)-len(Find)+1; i++ {
+		if string(Input[i:i+len(Find)]) == "http://" {
 
-	found := false
-	for b := 0; b < len(bytes)-1; b++ {
+			for j := i + len(Find); j < len(Input); j++ {
+				if Input[j] == ' ' {
 
-		if bytes[b] == 47 && bytes[b-1] == 47 && bytes[b-2] == 58 && bytes[b-3] == 112 && bytes[b-4] == 116 && bytes[b-5] == 116 && bytes[b-6] == 104 {
-			found = true
-			continue
-		}
-		if found {
-			if bytes[b] == 32 {
-				break
+					for k := i + len(Find); k < j; k++ {
+						Input[k] = '*'
+					}
+					break
+				}
 			}
-			bytes[b] = byte('*')
-
 		}
 	}
-	fmt.Printf("Маскированный байтовый срез: %v\n", string(usr))
+
+	fmt.Println("Результат:", string(Input)) // Вывод результата
 }
