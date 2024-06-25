@@ -1,35 +1,67 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"reflect"
+	"testing"
 )
 
-func main() {
-	bytes := []byte("Hello, its my page: http://localhodsersest123.com See you")
-
-	usr := bytes[:]
-	for _, b := range bytes {
-		fmt.Printf("%v", b)
-		letter := string(b)
-		fmt.Printf("%v\n", letter) // Выводим значение каждого байта
-	}
-	fmt.Println()
-	fmt.Println(string(usr))
-
-	found := false
-	for b := 0; b < len(bytes)-1; b++ {
-
-		if bytes[b] == 47 && bytes[b-1] == 47 && bytes[b-2] == 58 && bytes[b-3] == 112 && bytes[b-4] == 116 && bytes[b-5] == 116 && bytes[b-6] == 104 {
-			found = true
-			continue
-		}
-		if found {
-			if bytes[b] == 32 {
+func maskURLs(input string) string {
+	result := []byte(input)
+	urlPrefix := []byte("http://")
+	for i := 0; i < len(result); i++ {
+		match := true
+		for j := 0; j < len(urlPrefix); j++ {
+			if i+j >= len(result) || result[i+j] != urlPrefix[j] {
+				match = false
 				break
 			}
-			bytes[b] = byte('*')
-
+		}
+		if match {
+			j := i + len(urlPrefix)
+			for ; j < len(result); j++ {
+				if result[j] == ' ' {
+					break
+				}
+				result[j] = '*'
+			}
+			i = j
 		}
 	}
-	fmt.Printf("Маскированный байтовый срез: %v\n", string(usr))
+	return string(result)
+}
+
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Enter a string: ")
+	scanner.Scan()
+	text := scanner.Text()
+	//fmt.Println(text)
+
+	data := []byte(text)
+	maskedData := maskURLs(string(data))
+
+	fmt.Println(maskedData)
+
+}
+func TestMaskURLs(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"Visit our website at http://www.example.com for more information.", "Visit our website at http://************* for more information."},
+		{"Check out https://www.google.com for search.", "Check out https://************* for search."},
+		{"No URLs here.", "No URLs here."},
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			output := maskURLs(test.input)
+			if !reflect.DeepEqual(output, test.expected) {
+				t.Errorf("Expected: %s, but got: %s", test.expected, output)
+			}
+		})
+	}
 }
